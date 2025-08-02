@@ -15,7 +15,7 @@ import java.util.Properties
 
 fun loadRedisUri(): String? {
     val props = Properties()
-    val stream = object {}.javaClass.classLoader.getResourceAsStream("redis.properties")
+    val stream = object {}.javaClass.classLoader.getResourceAsStream("private_redis.properties")
     return if (stream != null) {
         props.load(stream)
         props.getProperty("redis.uri")

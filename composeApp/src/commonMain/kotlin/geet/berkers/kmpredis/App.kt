@@ -18,24 +18,18 @@ import androidx.compose.material.*
 import androidx.compose.ui.unit.dp
 import geet.berkers.kmpredis.redis.LettuceRedisClient
 import kotlinx.coroutines.launch
-//import java.util.Properties
 
-val client by lazy { LettuceRedisClient() }
 
-fun loadRedisUri(): String? {
-//    val props = Properties()
-//    val stream = object {}.javaClass.classLoader.getResourceAsSFretream("redis.properties")
-//    return if (stream != null) {
-//        props.load(stream)
-//        props.getProperty("redis.uri")
-//    } else null
+expect fun loadRedisUri() : String?
+expect fun loadRedisUri(context: Any): String?
 
-    return "rediss://red-d270om6uk2gs73cn7b90:iRgdfXaxQpc330NOnY5X33zyhm5rDAkw@frankfurt-keyvalue.render.com:6379"
-}
+expect val client : LettuceRedisClient
+
 
 @Composable
-fun App(redisClient: RedisClientInterface = client) {
-    var uri by remember { mutableStateOf(loadRedisUri() ?: "") }
+fun App(redisConnectionUri: String = "") {
+    val redisClient = client
+    var uri by remember { mutableStateOf(redisConnectionUri ?: "") }
 
     var key by remember { mutableStateOf("") }
     var value by remember { mutableStateOf("") }

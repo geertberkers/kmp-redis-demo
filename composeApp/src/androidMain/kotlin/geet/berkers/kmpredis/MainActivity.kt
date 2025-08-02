@@ -14,8 +14,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        val uri = loadRedisUri(this) ?: ""
         setContent {
-            App()
+            App(uri)
         }
     }
 }
@@ -24,6 +25,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppAndroidPreview() {
     MaterialTheme {
-        App(client)
+        App()
     }
 }
