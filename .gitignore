@@ -32,3 +32,4 @@ google-services.json
 
 # Android Profiling
 *.hprof
+src/commonMain/resources/private_redis.properties
