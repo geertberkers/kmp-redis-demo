@@ -1,4 +1,6 @@
-package geet.berkers.kmpredis
+package geet.berkers.kmpredis.impl
+
+import geet.berkers.kmpredis.getPlatform
 
 class Greeting {
     private val platform = getPlatform()

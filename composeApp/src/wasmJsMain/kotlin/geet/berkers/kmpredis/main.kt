@@ -2,11 +2,13 @@ package geet.berkers.kmpredis
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
+import geet.berkers.kmpredis.screens.App
 import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     ComposeViewport(document.body!!) {
-        App()
+        val uri = loadRedisUri() ?: ""
+        App(redisConnectionUri = uri)
     }
 }

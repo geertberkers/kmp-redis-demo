@@ -1,5 +1,6 @@
-package geet.berkers.kmpredis.redis
+package geet.berkers.kmpredis
 
+import geet.berkers.kmpredis.interfaces.RedisClientInterface
 import io.lettuce.core.ExperimentalLettuceCoroutinesApi
 import io.lettuce.core.RedisClient
 import io.lettuce.core.api.StatefulRedisConnection
@@ -9,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+
 
 @OptIn(ExperimentalLettuceCoroutinesApi::class)
 class LettuceRedisClient : RedisClientInterface {
@@ -51,15 +53,17 @@ class LettuceRedisClient : RedisClientInterface {
 
     @OptIn(ExperimentalLettuceCoroutinesApi::class)
     override fun getAllKeyValues(): Flow<Pair<String, String?>> = flow {
-        val syncCommands = connection?.sync()  // get synchronous commands to call `keys`
-        val keys: List<String> =
-            syncCommands?.keys("*").orEmpty()  // blocking call is OK in flow block
-        val asyncCommands = connection?.coroutines()      // back to coroutines for value fetching
+        connection?.let {
+            val syncCommands = it.sync()  // get synchronous commands to call `keys`
+            val keys: List<String> = syncCommands?.keys("*").orEmpty()  // blocking call is OK in flow block
+            val asyncCommands = it.coroutines()      // back to coroutines for value fetching
 
-        for (key in keys) {
-            val value = asyncCommands?.get(key)
-            emit(key to value)
-        }
+            for (key in keys) {
+                val value = asyncCommands.get(key)
+                emit(key to value)
+            }
+        } ?: emit("Connection" to "IsNull")
+
     }
 
 

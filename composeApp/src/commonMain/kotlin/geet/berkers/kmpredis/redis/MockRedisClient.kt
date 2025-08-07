@@ -1,5 +1,6 @@
 package geet.berkers.kmpredis.redis
 
+import geet.berkers.kmpredis.interfaces.RedisClientInterface
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
@@ -11,7 +12,7 @@ class MockRedisClient : RedisClientInterface {
         data.clear()
     }
 
-    override suspend fun connect(host: String): Boolean {
+    override suspend fun connect(uri: String): Boolean {
         connected = true // simulate success
         return connected
     }

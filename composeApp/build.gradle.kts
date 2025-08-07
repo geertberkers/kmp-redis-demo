@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    kotlin("plugin.serialization") version "1.9.10" // or match your Kotlin version
 }
 
 
@@ -38,25 +39,25 @@ kotlin {
 
 
 
-//    @OptIn(ExperimentalWasmDsl::class)
-//    wasmJs {
-//        outputModuleName.set("composeApp")
-//        browser {
-//            val rootDirPath = project.rootDir.path
-//            val projectDirPath = project.projectDir.path
-//            commonWebpackConfig {
-//                outputFileName = "composeApp.js"
-//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-//                    static = (static ?: mutableListOf()).apply {
-//                        // Serve sources to debug inside browser
-//                        add(rootDirPath)
-//                        add(projectDirPath)
-//                    }
-//                }
-//            }
-//        }
-//        binaries.executable()
-//    }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        outputModuleName.set("composeApp")
+        browser {
+            val rootDirPath = project.rootDir.path
+            val projectDirPath = project.projectDir.path
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        // Serve sources to debug inside browser
+                        add(rootDirPath)
+                        add(projectDirPath)
+                    }
+                }
+            }
+        }
+        binaries.executable()
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -71,12 +72,6 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodelCompose)
                 implementation(libs.androidx.lifecycle.runtimeCompose)
                 implementation(compose.material) // redundant but kept
-
-                implementation(kotlin("stdlib"))
-                implementation("io.lettuce:lettuce-core:6.7.1.RELEASE")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.7.3") // required for Lettuce coroutines
-
             }
         }
         val commonTest by getting {
@@ -104,7 +99,13 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.7.3") // required for Lettuce coroutines
             }
         }
-//        val wasmJsMain by getting
+
+        val wasmJsMain by getting {
+            dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+            }
+        }
     }
 }
 

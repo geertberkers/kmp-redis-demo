@@ -1,7 +1,11 @@
 package geet.berkers.kmpredis
 
+import geet.berkers.kmpredis.interfaces.RedisClientInterface
 import java.util.Properties
 
+actual val client: RedisClientInterface by lazy {
+    LettuceRedisClient()
+}
 
 actual fun loadRedisUri(): String? {
     return try {

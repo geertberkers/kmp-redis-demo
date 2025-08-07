@@ -1,11 +1,12 @@
 package geet.berkers.kmpredis
 
 import android.content.Context
-import geet.berkers.kmpredis.redis.LettuceRedisClient
+import geet.berkers.kmpredis.interfaces.RedisClientInterface
 import java.util.Properties
 
-actual val client: LettuceRedisClient
-    get() = LettuceRedisClient()
+actual val client: RedisClientInterface by lazy {
+    LettuceRedisClient()
+}
 
 actual fun loadRedisUri(): String? = null // Not used
 

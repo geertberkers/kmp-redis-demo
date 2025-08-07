@@ -1,6 +1,6 @@
-package geet.berkers.kmpredis
+package geet.berkers.kmpredis.screens
 
-import geet.berkers.kmpredis.redis.RedisClientInterface
+import geet.berkers.kmpredis.interfaces.RedisClientInterface
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,20 +16,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.ui.unit.dp
-import geet.berkers.kmpredis.redis.LettuceRedisClient
+import geet.berkers.kmpredis.client
+import geet.berkers.kmpredis.getPlatform
 import kotlinx.coroutines.launch
 
 
-expect fun loadRedisUri() : String?
-expect fun loadRedisUri(context: Any): String?
-
-expect val client : LettuceRedisClient
-
-
 @Composable
-fun App(redisConnectionUri: String = "") {
-    val redisClient = client
-    var uri by remember { mutableStateOf(redisConnectionUri ?: "") }
+fun App(
+    redisConnectionUri: String = "",
+    redisClient: RedisClientInterface = client
+) {
+    var uri by remember { mutableStateOf(redisConnectionUri) }
 
     var key by remember { mutableStateOf("") }
     var value by remember { mutableStateOf("") }
@@ -130,6 +127,7 @@ fun App(redisConnectionUri: String = "") {
                             } else "Failed to add key"
                             key = ""
                             value = ""
+                            reloadKeysTrigger++ // trigger reload keys
                         } else {
                             message = "Not connected"
                         }
@@ -167,16 +165,17 @@ fun App(redisConnectionUri: String = "") {
         Spacer(Modifier.height(16.dp))
 
         if (connected) {
-            AppKeys(client = redisClient, reloadTrigger = reloadKeysTrigger)
+            AppKeys(client = redisClient, reloadTrigger = reloadKeysTrigger, uri = uri)
         }
     }
 }
 
 @Composable
-fun AppKeys(client: RedisClientInterface, reloadTrigger: Int) {
+fun AppKeys(client: RedisClientInterface, reloadTrigger: Int, uri: String) {
     val keyValueList = remember { mutableStateListOf<Pair<String, String?>>() }
 
     LaunchedEffect(reloadTrigger) {
+        println("AppKeysReloading keys $reloadTrigger")
         keyValueList.clear()
         client.getAllKeyValues().collect { pair ->
             if (!keyValueList.any { it.first == pair.first }) {
@@ -201,32 +200,3 @@ fun AppKeys(client: RedisClientInterface, reloadTrigger: Int) {
         }
     }
 }
-//
-//@Composable
-//@Preview
-//fun App() {
-//    MaterialTheme {
-//        var showContent by remember { mutableStateOf(false) }
-//        Column(
-//            modifier = Modifier
-//                .background(MaterialTheme.colorScheme.primaryContainer)
-//                .safeContentPadding()
-//                .fillMaxSize(),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//        ) {
-//            Button(onClick = { showContent = !showContent }) {
-//                Text("Click me!")
-//            }
-//            AnimatedVisibility(showContent) {
-//                val greeting = remember { Greeting().greet() }
-//                Column(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                ) {
-//                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-//                    Text("Compose: $greeting")
-//                }
-//            }
-//        }
-//    }
-//}
