@@ -2,6 +2,7 @@ package geert.berkers.kmpredis
 
 import geet.berkers.kmpredis.SERVER_PORT
 import geet.berkers.kmpredis.impl.Greeting
+import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -19,6 +20,8 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import java.util.concurrent.ConcurrentHashMap
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.http.*
 
 @Serializable
 data class KeyValue(val key: String, val value: String?)
@@ -28,6 +31,13 @@ fun main() {
     embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0") {
         install(ContentNegotiation) {
             json()
+        }
+
+        install(CORS) {
+            anyHost() // ⚠️ Allow from all origins (OK for local dev)
+            allowMethod(HttpMethod.Get)
+            allowMethod(HttpMethod.Post)
+            allowHeader(HttpHeaders.ContentType)
         }
         routing {
             post("/set") {
@@ -47,6 +57,9 @@ fun main() {
             get("/keys") {
                 val result = mockRedis.map { KeyValue(it.key, it.value) }
                 call.respond(result)
+            }
+            get("/ping") {
+                call.respondText("pong", ContentType.Text.Plain)
             }
         }
     }.start(wait = true)
